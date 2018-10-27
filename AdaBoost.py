@@ -8,7 +8,7 @@ Created on Wed Mar 29 14:19:42 2017
 
 import numpy as np
 from WeakClassify import DecisionStump
-
+from sklearn.metrics import accuracy_score
 
 class AdaBoost:
     def __init__(self,X,y,Weaker=DecisionStump):
@@ -35,8 +35,12 @@ class AdaBoost:
         for i in range(M):   # self.G[i]为第i个弱分类器
             self.G[i]=self.Weaker(self.X,self.y)
             e=self.G[i].train(self.W) #根据当前权值进行该个弱分类器训练
-            self.alpha[i]=1/2*np.log((1-e)/e) #计算该分类器的系数
+            self.alpha[i]=1.0/2*np.log((1-e)/e) #计算该分类器的系数
             res=self.G[i].pred(self.X)  #res表示该分类器得出的输出
+
+            # 计算当前次数训练精确度
+            print "weak classfier acc", accuracy_score(self.y, res), "\n======================================================"
+
             # Z表示规范化因子
             Z=self.W*np.exp(-self.alpha[i]*self.y*res.transpose())
             self.W=(Z/Z.sum()).flatten(1) #更新权值
